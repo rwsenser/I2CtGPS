@@ -14,7 +14,8 @@
 
 // 2025-04-09:
 // mugged by RWS to work with I2CtGPS
-// this I2C client tested with xiao rp2040, pi pico rp2040 and esp32c3
+// this I2C client tested with xiao rp2040, pi pico rp2040 and xiao esp32c3
+// (different version needed for UNO, see GPStesterUNO)
 // remains public domain code
 
 #include <Wire.h>

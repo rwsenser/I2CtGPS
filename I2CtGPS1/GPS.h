@@ -12,7 +12,9 @@
 //
 
 // See license at the end of this file!
+// This is version 1: 2025-04-23
 
+// used for debugging, shows raw inout
 #undef GPS_PASSTHRU
 // #define GPS_PASSTHRU
 
@@ -82,7 +84,7 @@ class GPS {
     boolean skip = skipLine;
     if (!skip && (strlen(t) > 0)) {
       // Serial.print("Field: "); Serial.print(fCnt); Serial.print(" :: "); Serial.println(t);
-      if (fCnt == 0 && (strcmp(t,"$GNGGA") != 0)) {  // was GPGGA
+      if (fCnt == 0 && ((strcmp(t,"$GNGGA") != 0) && (strcmp(t,"$GPGGA") != 0))   ) {  // was GPGGA
         skip = true;
       } else {
         // process the field by its number
@@ -118,16 +120,7 @@ class GPS {
     return skip;
   }
 
-  void loop() {
-#if 0
-#ifdef VERBOSE
-    loopCnt++;
-    if (loopCnt > 1000) {
-      Serial.print("!");
-      loopCnt = 0;
-    }
-#endif   
-#endif 
+  void loop() { 
     if (gpsStream -> available()>0) {
       loopCnt = 0;
       len = gpsStream -> readBytes(buffer, sizeof(buffer)-1);
@@ -136,7 +129,6 @@ class GPS {
       // Serial.print(">>> ");
       // Serial.println(buffer);
       Serial.print(buffer);
-
 #else    
       for (int k=0; k < strlen(buffer); k++) {
         char c = buffer[k];

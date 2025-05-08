@@ -1,6 +1,6 @@
 struct I2Cstruct {
   int numSats;
-  int cnt;
+  unsigned int cnt;
   float alt;
   float lat;
   float lng;

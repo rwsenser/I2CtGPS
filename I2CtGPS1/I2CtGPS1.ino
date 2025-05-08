@@ -1,6 +1,8 @@
 // I2CtGPS based on GPS-play taken from Tracker9X_TX4_GPS
 // Bob Senser, 2025-04-03
 
+// This is version 1: 2025-04-23
+
 // mixes I2C and GPS via serial
 // GPS is on Serial1
 // Log output on Serial (not ...1)
@@ -18,7 +20,7 @@
 #include <Wire.h>
 
 #undef VERBOSE
-// #define VERBOSE
+//  #define VERBOSE
 
 #include "GPS.h"
 #include "I2Cstruct.h"
@@ -31,8 +33,10 @@ char buffer2[64];
 
 void setup() {
   buffer[0]=0;
-  Wire.begin(I2C_ADDRESS);                // join i2c bus with given address
-  Wire.onRequest(requestEvent); // register event
+  data.numSats = -9999;           // marker for not data yet
+  memcpy(buffer2,&data,sizeof(data));  // publish the -9999
+  Wire.begin(I2C_ADDRESS);        // join i2c bus with given address
+  Wire.onRequest(requestEvent);  // register event
 }
 
 // function that executes whenever data is requested by master
@@ -42,7 +46,7 @@ void requestEvent() {
   // There is a compilter issue that prevents
   // use of strlen and print in here...???
   size_t len = sizeof(data); 
-  Wire.write((char *) buffer2,len); 
+  Wire.write((char *) buffer2,len);
 }
 void setup1() { 
 #ifdef VERBOSE  
@@ -62,9 +66,8 @@ void loop1() {
   myGPS.loop(); 
   myGPS.ts = millis();
   if (myGPS.alt > 0) {
-      sprintf(buffer, "%c%d:%ld,%f,%f,%.2f,%d",myGPS.type, myGPS.cnt,
-                  (myGPS.ts / 1000), myGPS.lat, myGPS.lng, myGPS.alt,
-                  myGPS.numSats); 
+      sprintf(buffer, "%c%d:%ld,%d,%.2f,%f,%f",myGPS.type, myGPS.cnt,
+                  (myGPS.ts / 1000), myGPS.numSats, myGPS.alt, myGPS.lat, myGPS.lng);
       // load data into shared struct
       // no mutex is used but this seems to be reliable
       // I suspect with this RP2040 chip that float and int variables
@@ -73,11 +76,9 @@ void loop1() {
       data.numSats = myGPS.numSats;       
       data.cnt = myGPS.cnt;  
       data.alt = myGPS.alt;
-      data.lat = myGPS.lat;
-      data.lng = myGPS.lng;
       // correct to N/S/E/W coding
-      if (myGPS.latR == 'S') data.lat *= -1.0;
-      if (myGPS.lngR == 'W') data.lng *= -1.0;
+      if (myGPS.latR == 'S') data.lat = -myGPS.lat; else data.lat = myGPS.lat;
+      if (myGPS.lngR == 'W') data.lng = -myGPS.lng; else data.lng = myGPS.lng;
       // the requestEvent() function want to access a buffer .... so copy tge struct???
       memcpy(buffer2,&data,sizeof(data));            
 #ifdef VERBOSE
