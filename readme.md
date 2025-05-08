@@ -8,5 +8,5 @@ to something like GPStester.hideino.   If this file is not renamed, the ARDUINO 
 processing this extra file.  If you are using an UNO, please create an ARDUINO directory for GPStesterUNO and move
 GPStesterUNO.ino to this new directory.
 
-This interface has been sucessfully tested with several hobby-grade GPS boards and serveral I2C clients.
+This interface has been sucessfully tested with several hobby-grade GPS boards and several I2C clients.
 
